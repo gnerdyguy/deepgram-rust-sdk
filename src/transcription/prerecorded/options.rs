@@ -27,6 +27,12 @@ pub struct Options {
     keyword_boost_legacy: bool,
     utterances: Option<Utterances>,
     tags: Vec<String>,
+    filler_words: Option<bool>,
+    summarize: Option<Summarize>,
+    analyze_sentiment: Option<bool>,
+    detect_language: Option<bool>,
+    detect_topics: Option<bool>,
+    smart_format: Option<bool>,
 }
 
 /// Used as a parameter for [`OptionsBuilder::tier`].
@@ -37,6 +43,9 @@ pub struct Options {
 #[derive(Debug, PartialEq, Eq, Clone, Copy, Hash)]
 #[non_exhaustive]
 pub enum Tier {
+    #[allow(missing_docs)]
+    Nova,
+
     #[allow(missing_docs)]
     Enhanced,
 
@@ -241,6 +250,25 @@ enum Multichannel {
     Enabled { models: Option<Vec<Model>> },
 }
 
+/// Used as a parameter for [`OptionsBuilder::summarize`].
+///
+/// See the [Deepgram Summarization feature docs][docs] for more info.
+///
+/// [docs]: https://developers.deepgram.com/docs/summarization-v1
+/// [docs]: https://developers.deepgram.com/docs/summarization
+#[derive(Debug, PartialEq, Eq, Clone, Hash)]
+#[non_exhaustive]
+pub enum Summarize {
+    #[allow(missing_docs)]
+    Disabled,
+
+    #[allow(missing_docs)]
+    Enabled,
+
+    #[allow(missing_docs)]
+    V2,
+}
+/// 
 /// Builds an [`Options`] object using [the Builder pattern][builder].
 ///
 /// Use it to set of Deepgram's features, excluding the Callback feature.
@@ -282,6 +310,12 @@ impl OptionsBuilder {
             keyword_boost_legacy: false,
             utterances: None,
             tags: Vec::new(),
+            filler_words: None,
+            summarize: None,
+            analyze_sentiment: None,
+            detect_language: None,
+            detect_topics: None,
+            smart_format: None,
         })
     }
 
@@ -1051,6 +1085,145 @@ impl OptionsBuilder {
         self.0.tags.extend(tag.into_iter().map(String::from));
         self
     }
+    
+    /// Set the filler_words feature.
+    ///
+    /// Not necessarily available for all languages or models.
+    ///  
+    /// This feature enables/disables deepgram returning things like 'umm's
+    /// and 'ahh's in your transcript
+    /// 
+    /// See the [Deepgram Filler Words feature docs][docs] for more info.
+    ///
+    /// [docs]: https://developers.deepgram.com/docs/filler-words
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use deepgram::transcription::prerecorded::options::Options;
+    /// #
+    /// let options = Options::builder()
+    ///     .numerals(true)
+    ///     .build();
+    /// ```
+    pub fn filler_words(mut self, filler_words: bool) -> Self {
+        self.0.filler_words = Some(filler_words);
+        self
+    }
+    
+    /// Set the summarize feature.
+    ///
+    /// Not necessarily available for all languages.
+    /// 
+    /// This feature will generate brief summaries of the information
+    /// that's discussed in the audio
+    ///
+    /// See the [Deepgram Summarize feature docs][docs] for more info.
+    ///
+    /// [docs]: https://developers.deepgram.com/docs/summarization-v1
+    /// [docs]: https://developers.deepgram.com/docs/summarization
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use deepgram::transcription::prerecorded::options::Options;
+    /// #
+    /// let options = Options::builder()
+    ///     .numerals(true)
+    ///     .build();
+    /// ```
+
+    pub fn summarize(mut self, summarize: Summarize) -> Self {
+        self.0.summarize = Some(summarize);
+        self
+    }
+    
+    /// Set the analyze_sentiment feature.
+    ///
+    /// Not necessarily available for all languages.
+    ///
+    /// See the [Deepgram Sentiment Analysis feature docs][docs] for more info.
+    ///
+    /// [docs]: https://developers.deepgram.com/reference/pre-recorded
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use deepgram::transcription::prerecorded::options::Options;
+    /// #
+    /// let options = Options::builder()
+    ///     .numerals(true)
+    ///     .build();
+    /// ```
+    pub fn analyze_sentiment(mut self, analyze_sentiment: bool) -> Self {
+        self.0.analyze_sentiment = Some(analyze_sentiment);
+        self
+    }
+    
+    /// Set the detect_language feature.
+    ///
+    /// Not necessarily available for all languages.
+    ///
+    /// See the [Deepgram Language Detection feature docs][docs] for more info.
+    ///
+    /// [docs]: https://developers.deepgram.com/docs/language-detection
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use deepgram::transcription::prerecorded::options::Options;
+    /// #
+    /// let options = Options::builder()
+    ///     .numerals(true)
+    ///     .build();
+    /// ```
+    pub fn detect_language(mut self, detect_language: bool) -> Self {
+        self.0.detect_language = Some(detect_language);
+        self
+    }
+    
+    /// Set the detect_topics feature.
+    ///
+    /// Not necessarily available for all languages.
+    ///
+    /// See the [Deepgram Topic Detection feature docs][docs] for more info.
+    ///
+    /// [docs]: https://developers.deepgram.com/docs/topic-detection
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use deepgram::transcription::prerecorded::options::Options;
+    /// #
+    /// let options = Options::builder()
+    ///     .numerals(true)
+    ///     .build();
+    /// ```
+    pub fn detect_topics(mut self, detect_topics: bool) -> Self {
+        self.0.detect_topics = Some(detect_topics);
+        self
+    }
+    /// Set the smart_format feature.
+    ///
+    /// Not necessarily available for all languages.
+    ///
+    /// See the [Deepgram Smart Formatting feature docs][docs] for more info.
+    ///
+    /// [docs]: https://developers.deepgram.com/docs/smart-format
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use deepgram::transcription::prerecorded::options::Options;
+    /// #
+    /// let options = Options::builder()
+    ///     .numerals(true)
+    ///     .build();
+    /// ```
+    pub fn smart_format(mut self, smart_format: bool) -> Self {
+        self.0.smart_format = Some(smart_format);
+        self
+    }
 
     /// Finish building the [`Options`] object.
     pub fn build(self) -> Options {
@@ -1091,6 +1264,12 @@ impl Serialize for SerializableOptions<'_> {
             keyword_boost_legacy,
             utterances,
             tags,
+            filler_words,
+            summarize,
+            analyze_sentiment,
+            detect_language,
+            detect_topics,
+            smart_format,
         } = self.0;
 
         if let Some(tier) = tier {
@@ -1204,6 +1383,31 @@ impl Serialize for SerializableOptions<'_> {
             seq.serialize_element(&("tag", element))?;
         }
 
+        if let Some(filler_words) = filler_words {
+            seq.serialize_element(&("filler_words", filler_words))?;
+        }
+        
+        // place holder for the summarize feature
+        if let Some(summarize) = summarize {
+            seq.serialize_element(&("summarize", summarize.as_ref()))?;
+        }
+        
+        if let Some(analyze_sentiment) = analyze_sentiment {
+            seq.serialize_element(&("analyze_sentiment", analyze_sentiment))?;
+        }
+        
+        if let Some(detect_language) = detect_language {
+            seq.serialize_element(&("detect_language", detect_language))?;
+        }
+        
+        if let Some(detect_topics) = detect_topics {
+            seq.serialize_element(&("detect_topics", detect_topics))?;
+        }
+        
+        if let Some(smart_format) = smart_format {
+            seq.serialize_element(&("smart_format", smart_format))?;
+        }
+        
         seq.end()
     }
 }
@@ -1213,6 +1417,7 @@ impl AsRef<str> for Tier {
         use Tier::*;
 
         match self {
+            Nova => "nova",
             Enhanced => "enhanced",
             Base => "base",
         }
@@ -1292,6 +1497,18 @@ fn models_to_string(models: &[Model]) -> String {
         .map(AsRef::<str>::as_ref)
         .collect::<Vec<&str>>()
         .join(":")
+}
+
+impl AsRef<str> for Summarize {
+    fn as_ref(&self) -> &str {
+        use Summarize::*;
+
+        match self {
+            Disabled => "false",
+            Enabled => "true",
+            V2 => "v2"
+        }
+    }
 }
 
 #[cfg(test)]
@@ -1401,9 +1618,15 @@ mod serialize_options_tests {
             }])
             .utterances_with_utt_split(0.9)
             .tag(["Tag 1"])
+            .filler_words(true)
+            .summarize(Summarize::Enabled)
+            .analyze_sentiment(true)
+            .detect_language(true)
+            .detect_topics(true)
+            .smart_format(true)
             .build();
 
-        check_serialization(&options, "tier=enhanced&model=finance%3Aextra_crispy%3Aconversationalai&version=1.2.3&language=en-US&punctuate=true&profanity_filter=true&redact=pci&redact=ssn&diarize=true&ner=true&multichannel=true&alternatives=4&numerals=true&search=Rust&search=Deepgram&replace=Aaron%3AErin&keywords=Ferris&keywords=Cargo%3A-1.5&utterances=true&utt_split=0.9&tag=Tag+1");
+        check_serialization(&options, "tier=enhanced&model=finance%3Aextra_crispy%3Aconversationalai&version=1.2.3&language=en-US&punctuate=true&profanity_filter=true&redact=pci&redact=ssn&diarize=true&ner=true&multichannel=true&alternatives=4&numerals=true&search=Rust&search=Deepgram&replace=Aaron%3AErin&keywords=Ferris&keywords=Cargo%3A-1.5&utterances=true&utt_split=0.9&tag=Tag+1&filler_words=true&summarize=true&analyze_sentiment=true&detect_language=true&detect_topics=true&smart_format=true");
     }
 
     #[test]
@@ -1723,4 +1946,91 @@ mod serialize_options_tests {
             "tag=Tag+1&tag=Tag+2",
         );
     }
+
+    #[test]
+    fn filler_words() {
+        check_serialization(
+            &Options::builder().filler_words(true).build(),
+            "filler_words=true",
+        );
+
+        check_serialization(
+            &Options::builder().filler_words(false).build(),
+            "filler_words=false",
+        );
+    }
+
+    #[test]
+    fn summarize() {
+         check_serialization(
+            &Options::builder().summarize(Summarize::Disabled).build(),
+            "summarize=false",
+        );
+
+        check_serialization(
+            &Options::builder()
+                .summarize(Summarize::Enabled)
+                .build(),
+            "summarize=true",
+        );
+
+        check_serialization(
+            &Options::builder()
+                .summarize(Summarize::V2)
+                .build(),
+            "summarize=v2",
+        );
+    }
+
+    #[test]
+    fn analyze_sentiment() {
+        check_serialization(
+            &Options::builder().analyze_sentiment(true).build(),
+            "analyze_sentiment=true",
+        );
+
+        check_serialization(
+            &Options::builder().analyze_sentiment(false).build(),
+            "analyze_sentiment=false",
+        );        
+    }
+
+    #[test]
+    fn detect_language() {
+        check_serialization(
+            &Options::builder().detect_language(true).build(),
+            "detect_language=true",
+        );
+
+        check_serialization(
+            &Options::builder().detect_language(false).build(),
+            "detect_language=false",
+        );
+    }
+
+    #[test]
+    fn detect_topics() {
+        check_serialization(
+            &Options::builder().detect_topics(true).build(),
+            "detect_topics=true",
+        );
+
+        check_serialization(
+            &Options::builder().detect_topics(false).build(),
+            "detect_topics=false",
+        );
+    }
+
+    #[test]
+    fn smart_format() {
+        check_serialization(
+            &Options::builder().smart_format(true).build(),
+            "smart_format=true",
+        );
+
+        check_serialization(
+            &Options::builder().smart_format(false).build(),
+            "smart_format=false",
+        );
+    }    
 }
